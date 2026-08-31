@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hemsidan stängd</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="lock-page-body">
+    <main class="lock-page" aria-live="polite">
+      <p class="lock-eyebrow">404</p>
+      <h1>Hemsidan är stängd</h1>
+      <p>Den här sidan är tillfälligt låst. Endast Super-Admin kan öppna den igen genom att ange rätt lösenord.</p>
+
+      <form id="siteLockForm">
+        <label>
+          Super Admin-lösenord
+          <input id="siteLockPassword" type="password" placeholder="Skriv lösenordet" autocomplete="off" required />
+        </label>
+        <button type="submit">Öppna hemsidan</button>
+      </form>
+      <p id="siteLockError" class="login-status" role="alert"></p>
+    </main>
+
+    <script>
+      const SITE_LOCK_PASSWORD = 'Drifty31212';
+      const SITE_LOCK_KEY = 'siteLockEnabled';
+      const SITE_UNLOCK_SESSION_KEY = 'siteUnlocked';
+
+      const form = document.getElementById('siteLockForm');
+      const passwordInput = document.getElementById('siteLockPassword');
+      const error = document.getElementById('siteLockError');
+
+      function unlockSite() {
+        sessionStorage.setItem(SITE_UNLOCK_SESSION_KEY, 'true');
+        localStorage.setItem(SITE_LOCK_KEY, 'false');
+        window.location.replace('index.html');
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const value = passwordInput.value.trim();
+        if (value === SITE_LOCK_PASSWORD) {
+          error.textContent = '';
+          unlockSite();
+          return;
+        }
+        error.textContent = 'Fel lösenord. Endast Super-Admin kan öppna hemsidan.';
+        passwordInput.value = '';
+        passwordInput.focus();
+      });
+
+      if (localStorage.getItem(SITE_LOCK_KEY) !== 'true') {
+        window.location.replace('index.html');
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>McDonalds Hamburgare | Meny</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+
+    <header class="topbar">
+      <div class="container nav-wrap">
+        <a class="brand" href="index.html" aria-label="Startsida">
+          <span class="brand-mark">M</span>
+          <div>
+            <strong>McDonalds</strong>
+            <small>Hamburgare</small>
+          </div>
+        </a>
+
+        <nav class="main-nav">
+          <a href="menu.html">Meny</a>
+          <a href="#order">Beställ</a>
+          <a href="staff.html">Personal</a>
+          <a href="apply.html">Ansök</a>
+        </nav>
+
+        <a class="nav-button" href="staff.html">Personal login</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="container menu-section">
+        <div class="section-heading">
+          <span class="eyebrow">Meny</span>
+          <h2>Vår smakfulla meny</h2>
+        </div>
+
+        <div id="menuGrid" class="menu-grid"></div>
+      </section>
+
+      <section class="builder-section container">
+        <div class="section-heading"><span class="eyebrow">Kiosk</span><h2>Bygg din egen burgare</h2></div>
+        <div class="builder-card">
+          <label>Antal kött<input id="builderMeat" type="number" min="1" max="3" value="1" /></label>
+          <label><input id="builderCheese" type="checkbox" /> Extra cheddar (+15 kr)</label>
+          <label><input id="builderBacon" type="checkbox" /> Crispy bacon (+20 kr)</label>
+          <label><input id="builderPickles" type="checkbox" checked /> Gurka (+0 kr)</label>
+          <div class="builder-result"><strong id="builderPrice">99 kr</strong><button class="primary-btn" id="addBuilderBurger" type="button">Lägg i kundvagn</button></div>
+        </div>
+      </section>
+
+      <section id="order" class="container order-section">
+        <div class="section-heading narrow">
+          <span class="eyebrow">Beställning</span>
+          <h2>Din beställning</h2>
+        </div>
+
+        <div class="order-wrap">
+          <div class="cart-panel">
+            <div id="cartItems" class="cart-items">
+              <p class="empty-cart">Din kundvagn är tom. Lägg till något från menyn.</p>
+            </div>
+
+            <div class="totals">
+              <div>
+                <span>Summa</span>
+                <strong id="subtotal">0 kr</strong>
+              </div>
+              <hr />
+              <div class="grand-total">
+                <span>Total</span>
+                <strong id="totalPrice">0 kr</strong>
+              </div>
+            </div>
+
+            <button class="checkout-btn">Betala till ErkanBra</button>
+            <p class="payment-note">Betalas via Polreg.se</p>
+            <div class="customer-tools">
+              <label>RP-namn<input id="rpName" required maxlength="24" placeholder="Ditt RP-namn" /></label>
+              <label class="check-line"><input id="blueLightDiscount" type="checkbox" /> Jag är blåljuspersonal i tjänst (-100 kr vid Äta här)</label>
+              <label class="check-line"><input id="driveThruWaiting" type="checkbox" /> Jag står i Drive-thru-kön nu</label>
+              <small class="pickup-summary">Avhämtningssätt: <strong id="pickupModeSummary">Takeaway</strong></small>
+              <small id="pointsBalance">M-Points: 0</small>
+            </div>
+            <div class="order-status-panel hidden" id="orderStatusPanel">
+              <span class="status-kicker">Orderstatus</span>
+              <strong id="orderStatusText">Mottagen</strong>
+              <div class="status-track"><span id="orderStatusProgress"></span></div>
+              <small id="orderStatusDetail">Köket har tagit emot din order.</small>
+              <strong class="pickup-code">Kod: <span id="pickupCode">0000</span></strong>
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <div class="info-card pickup-card">
+              <div class="card-heading-row">
+                <div><span class="eyebrow">Stockholm City</span><h3>Hämta din order</h3></div>
+                <span class="map-pin">●</span>
+              </div>
+              <p class="location-help">Alla kunder kan välja Äta här eller Takeaway. Hämtas direkt i restaurangen – färskt och varmt!</p>
+              <div class="pickup-options" role="radiogroup" aria-label="Välj avhämtningssätt">
+                <button class="pickup-option selected" data-pickup="Takeaway">Takeaway<span>Papperspåse</span></button>
+                <button class="pickup-option" data-pickup="Äta här">Äta här<span>Serveras på bricka</span></button>
+                <button class="pickup-option selected" data-queue="Drive-thru">Drive-thru<span>Hämta i bilen</span></button>
+                <button class="pickup-option" data-queue="Kassa">Kassa<span>Hämta vid disken</span></button>
+              </div>
+              <p class="selected-location">Avhämtningssätt: <strong id="selectedPickup">Takeaway · Drive-thru</strong></p>
+            </div>
+            <div class="info-card">
+              <h3>RP-beställning</h3>
+              <ul>
+                <li>Hämtas direkt i restaurangen</li>
+                <li>Välj mat direkt från menyn</li>
+                <li>Visa avhämtningskoden när maten är klar</li>
+              </ul>
+            </div>
+            <div class="info-card accent">
+              <h3>Aktuellt</h3>
+              <p id="currentSpecialDisplay">McDonalds Friday Special – Dubbel burger + crispy fries för 199 kr.</p>
+            </div>
+            <div class="info-card">
+              <h3>Dagens Happy Meal-leksak</h3>
+              <p id="happyMealToyDisplay">Ingen leksak angiven just nu.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <a class="discord-link" href="https://discord.gg/stockholmswedenroleplay" target="_blank" rel="noreferrer">Join Discord</a>
+
+        <p>Betalas via Polreg.se</p>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

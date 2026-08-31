@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>McDonalds Hamburgare | Personal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+
+    <header class="topbar">
+      <div class="container nav-wrap">
+        <a class="brand" href="index.html" aria-label="Startsida">
+          <span class="brand-mark">M</span>
+          <div>
+            <strong>McDonalds</strong>
+            <small>Hamburgare</small>
+          </div>
+        </a>
+
+        <nav class="main-nav">
+          <a href="menu.html">Meny</a>
+          <a href="menu.html#order">Beställ</a>
+          <a href="staff.html">Personal</a>
+          <a href="apply.html">Ansök</a>
+        </nav>
+
+        <a class="nav-button" href="menu.html">Se meny</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="portal-shell">
+        <div id="loginCard" class="auth-panel">
+          <div class="section-heading left-align">
+            <span class="eyebrow">Personal</span>
+            <h2>Shift & admin</h2>
+          </div>
+
+          <form id="loginForm" class="login-card full-login" onsubmit="event.preventDefault(); return handleStaffLogin();">
+            <h3>Logga in</h3>
+            <label>
+              Användarnamn
+              <input type="text" id="username" placeholder="ex. shiftadmin" required />
+            </label>
+            <label>
+              Lösenord
+              <input type="password" id="password" placeholder="••••••••" required />
+            </label>
+            <p id="loginStatus" class="login-status hidden" role="alert"></p>
+            <button type="submit" class="primary-btn full">Logga in</button>
+            <small>Demo: shiftadmin / admin123 | superadmin / superadmin123</small>
+          </form>
+        </div>
+
+        <div id="employeePortal" class="portal hidden portal-full">
+          <div class="portal-header">
+            <div>
+              <span class="eyebrow">Shift Portal</span>
+              <h3 id="employeePortalName" style="margin: 0;"></h3>
+            </div>
+            <button class="ghost-btn" onclick="logoutEmployee();">Logga ut</button>
+          </div>
+          <div id="employeeNotice" class="info-card" style="margin-bottom: 18px;">Ingen intern information just nu.</div>
+          <div id="employeeHandover" class="info-card hidden" style="margin-bottom: 18px;"></div>
+          <div class="portal-grid employee-tools">
+            <div id="employeeIdCard" class="info-card"></div>
+            <div id="employeeStats" class="info-card"></div>
+            <div id="employeeWarnings" class="info-card"></div>
+            <div class="info-card">
+              <h4>Digital handbok</h4>
+              <select id="handbookTopic" onchange="renderHandbook();"><option value="drive">Ta emot order i driven</option><option value="break">Regler för pauser</option><option value="dress">Klädkod</option></select>
+              <p id="handbookContent"></p>
+            </div>
+            <div class="info-card">
+              <h4>Ledighetansökan</h4>
+              <form onsubmit="return requestLeave(event);"><input id="leaveDays" type="number" min="1" max="90" placeholder="Antal dagar" required /><button class="secondary-btn full" type="submit">Ansök om ledighet</button></form>
+            </div>
+            <div class="info-card">
+              <h4>Rapportera tekniskt fel</h4>
+              <form onsubmit="return reportTechnicalIssue(event);"><textarea id="issueInput" rows="2" placeholder="Vad fungerar inte?" required></textarea><button class="secondary-btn full" type="submit">Skicka rapport</button></form>
+            </div>
+            <div class="info-card wide-card"><h4>Medarbetar-topplista</h4><div id="employeeLeaderboard"></div></div>
+          </div>
+          <div class="portal-grid">
+            <div class="admin-card">
+              <h4>Mina Shift</h4>
+              <label>Station / önskan<select id="employeeStation"><option>Disken (Kassa 1)</option><option>Drive-Thru</option><option>Köket (Grillen/Frityren)</option></select></label>
+              <button class="secondary-btn full" onclick="reportLowStock();">🔴 Varna för lågt lager</button>
+              <button class="primary-btn full" id="shiftBtn" onclick="toggleShift();">Gå in shift</button>
+              <button class="secondary-btn full" id="pauseShiftBtn" onclick="toggleShiftPause();" hidden>Ta rast</button>
+              <p id="shiftStatus" style="text-align: center; color: var(--muted); margin-top: 12px;"></p>
+            </div>
+            <div class="admin-card wide-card">
+              <h4>Ordrar</h4>
+              <div id="ordersContainer" style="max-height: 400px; overflow-y: auto;">
+                <p style="color: var(--muted); text-align: center;">Inga ordrar att ta.</p>
+              </div>
+            </div>
+            <div id="issueReportCard" class="admin-card wide-card" hidden><h4>Tekniska fel från personal</h4><div id="issueReportList" class="admin-orders"></div></div>
+          </div>
+        </div>
+
+        <div id="staffPortal" class="portal hidden portal-full">
+          <div class="portal-header">
+            <div>
+              <span class="eyebrow">Portal</span>
+              <h3>Personalhantering</h3>
+            </div>
+            <button class="ghost-btn" onclick="logoutAdmin();">Logga ut</button>
+          </div>
+
+          <div style="padding: 0 0 18px 0; display: flex; gap: 12px; flex-wrap: wrap;">
+            <button type="button" class="danger-btn" id="siteLockButton" onclick="toggleSiteLockdown();" style="flex: 1; min-width: 170px;">🛑 Stäng hemsidan</button>
+            <button type="button" class="primary-btn" id="breakfastModeBtn" onclick="toggleBreakfastMode();" style="flex: 1; min-width: 150px;">🌅 Frukostmeny AV</button>
+            <button type="button" class="primary-btn" id="restaurantStatusBtn" onclick="toggleRestaurantStatus();" style="flex: 1; min-width: 150px;">🟢 STÄNGD</button>
+            <button type="button" class="secondary-btn" onclick="sendMeetingNotice();" style="flex: 1; min-width: 150px;">📢 Personalmöte</button>
+            <button type="button" class="secondary-btn" id="sortActivityBtn" onclick="toggleSortByActivity();" style="flex: 1; min-width: 150px;">📊 Sortera aktivitet</button>
+          </div>
+
+          <div class="portal-grid">
+            <div class="admin-card">
+              <h4>Shift Admin</h4>
+              <form id="employeeForm" onsubmit="return handleEmployeeFormSubmit(event);">
+                <label>
+                  Namn
+                  <input type="text" id="employeeName" placeholder="Namn" required />
+                </label>
+                <label>
+                  Roll
+                  <select id="employeeRole">
+                    <option value="Kassör">Kassör</option>
+                    <option value="Kock">Kock</option>
+                    <option value="Leverans">Leverans</option>
+                    <option value="Admin">Admin</option>
+                  </select>
+                </label>
+                <label>
+                  Lösenord (Adminen bestämmer)
+                  <input type="text" id="employeePassword" placeholder="ex. kassa123" required />
+                </label>
+                <div class="permission-box">
+                  <label><input type="checkbox" checked /> Beställningar</label>
+                  <label><input type="checkbox" checked /> Kundservice</label>
+                  <label><input type="checkbox" /> Menyredigering</label>
+                  <label><input type="checkbox" /> Lönehantering</label>
+                </div>
+                <button type="submit" class="secondary-btn full">Skapa konto & Lägg till personal</button>
+              </form>
+              <div style="margin-top: 18px; padding: 14px; background: rgba(255, 199, 44, 0.08); border-radius: 12px; border: 1px solid rgba(255, 199, 44, 0.2);">
+                <p style="margin: 0 0 12px 0; font-weight: 600; color: var(--accent);">Skapade konton:</p>
+                <label style="margin-bottom: 12px;">
+                  Sök personal
+                  <input type="text" id="employeeSearchInput" placeholder="Sök efter namn..." style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,236,204,0.14); background: rgba(0,0,0,0.3); color: #fff; font-size: 0.9rem;" />
+                </label>
+                <ul id="employeeList" class="list-box" style="margin: 0;"></ul>
+                <div class="bulk-tools" style="margin-top: 12px;">
+                  <select id="bulkRoleSelect"><option value="Kassör">Kassör</option><option value="Kock">Kock</option><option value="Leverans">Leverans</option><option value="Skiftledare">Skiftledare</option><option value="Admin">Admin</option></select>
+                  <button type="button" class="secondary-btn" onclick="applyBulkRole();">Ändra valda roller</button>
+                </div>
+              </div>
+              <div class="info-card" style="margin-top: 14px;"><h5>Uniformsguide</h5><p>Tröja: Roblox-kläd-ID enligt er uniform.<br>Byxor: Roblox-kläd-ID enligt er uniform.<br>Keps: Roblox-kläd-ID enligt er uniform.</p></div>
+            </div>
+
+            <div class="admin-card">
+              <h4>Intern drift</h4>
+              <button class="secondary-btn full" onclick="setMaintenanceWindow();">Ställ in stängtimer</button>
+              <div id="stockAlertList" style="margin-top: 12px;"></div>
+              <form onsubmit="return saveStaffNotice(event);">
+                <label>Anslagstavla<textarea id="staffNoticeInput" rows="3" placeholder="Viktigt för dagens skift..."></textarea></label>
+                <button type="submit" class="secondary-btn full">Spara meddelande</button>
+              </form>
+              <form onsubmit="return addShiftPlan(event);" style="margin-top: 14px;">
+                <label>Planerat pass<input id="shiftPlanInput" required placeholder="Fredag 19:00 - Drive-thru" /></label>
+                <button type="submit" class="secondary-btn full">Lägg till pass</button>
+              </form>
+              <ul id="shiftPlanList" class="list-box"></ul>
+              <form onsubmit="return saveHandover(event);" style="margin-top: 14px;">
+                <label>Överlämning till nästa skift<textarea id="handoverInput" rows="3" placeholder="Lagerstatus, saker att följa upp..." ></textarea></label>
+                <button type="submit" class="secondary-btn full">Spara överlämning</button>
+              </form>
+              <ul id="handoverList" class="list-box"></ul>
+            </div>
+
+            <div class="admin-card">
+              <h4>Skiftrapporter</h4>
+              <form onsubmit="return saveShiftReport(event);">
+                <label>Skiftledare anteckningar
+                  <textarea id="shiftReportInput" rows="4" placeholder="Sammanfattning från skiftet: t.ex. &quot;Bra service idag, många kunder, Alfred skötte grillen perfekt, lite strul med kassorna vid 19:30&quot;"></textarea>
+                </label>
+                <button type="submit" class="secondary-btn full">Spara skiftrapport</button>
+              </form>
+              <div style="margin-top: 14px;">
+                <p style="font-weight: 600; font-size: 0.9rem; color: var(--muted);">Senaste rapporter:</p>
+                <ul id="shiftReportList" class="list-box" style="max-height: 300px; overflow-y: auto;"></ul>
+              </div>
+            </div>
+
+            <div class="admin-card wide-card overview-card">
+              <div class="card-heading-row">
+                <div>
+                  <span class="eyebrow">Översikt</span>
+                  <h4>Kontrollpanel</h4>
+                </div>
+                <span class="live-status"><span></span> Live</span>
+              </div>
+              <div class="overview-stats">
+                <div><strong id="employeeCount">0</strong><span>Personal</span></div>
+                <div><strong id="orderCount">0</strong><span>Öppna ordrar</span></div>
+                <div><strong id="revenueTotal">0 kr</strong><span>Ordervärde</span></div>
+              </div>
+              <div class="overview-orders">
+                <div class="card-heading-row"><h5>Alla ordrar</h5><span id="overviewUpdated">Uppdateras automatiskt</span></div>
+                <div id="adminOrdersContainer" class="admin-orders"><p class="empty-state">Inga ordrar ännu.</p></div>
+              </div>
+            </div>
+
+            <div class="admin-card wide-card workforce-card">
+              <div class="card-heading-row"><div><span class="eyebrow">Personal</span><h4>Veckans arbetare</h4></div><span class="live-status"><span></span> Uppdaterad</span></div>
+              <div id="weeklyWorker" class="weekly-worker"><p class="empty-state">Ingen aktivitet registrerad ännu.</p></div>
+              <div class="warning-tools">
+                <label>Välj personal<select id="warningEmployeeSelect"></select></label>
+                <button type="button" class="danger-btn" id="addWarningBtn" onclick="addServiceWarning();">Ge tjänstevarning</button>
+                <button type="button" class="danger-btn" onclick="addBulkServiceWarning();">Ge varning till valda</button>
+                <button type="button" class="secondary-btn" id="addInactiveBtn" onclick="addInactivePass();">Registrera inaktivt pass</button>
+              </div>
+              <div id="warningList" class="warning-list"></div>
+              <form onsubmit="return voteWeeklyWorker(event);" style="margin-top: 14px;">
+                <label>Rösta på Veckans arbetare<select id="weeklyWorkerSelect"></select></label>
+                <button type="submit" class="secondary-btn">Rösta</button>
+              </form>
+            </div>
+
+            <div class="admin-card wide-card">
+              <h4>Kassakvitto-arkiv</h4>
+              <input id="receiptSearchInput" placeholder="Sök ordernummer..." oninput="renderReceiptArchive();" />
+              <div id="receiptArchiveList" class="admin-orders"></div>
+            </div>
+
+            <div class="admin-card wide-card shifts-card">
+              <div class="card-heading-row"><div><span class="eyebrow">Shift Admin</span><h4>Shiftledartavla</h4></div><span id="activeShiftCount" class="live-status"><span></span> 0 aktiva</span></div>
+              <p class="location-help">Se alla pass och justera timmar, minuter eller sekunder.</p>
+              <div id="shiftBoard" class="shift-board"><p class="empty-state">Inga shiftar registrerade ännu.</p></div>
+            </div>
+
+            <div class="admin-card wide-card">
+              <div class="card-heading-row"><div><span class="eyebrow">Live</span><h4>I tjänst nu</h4></div><span class="live-status"><span></span> Uppdateras live</span></div>
+              <div id="onDutyBoard" class="shift-board"><p class="empty-state">Ingen personal är i tjänst.</p></div>
+            </div>
+
+            <div class="admin-card wide-card applications-card">
+              <div class="card-heading-row"><div><span class="eyebrow">Rekrytering</span><h4>Inkomna ansökningar</h4></div><span id="applicationCount">0 nya</span></div>
+              <input id="applicationSearchInput" placeholder="Sök tidigare ansökan på Discord-namn..." oninput="renderApplications();" />
+              <div id="applicationsContainer" class="applications-list"><p class="empty-state">Inga ansökningar ännu.</p></div>
+              <div class="approved-applications">
+                <div class="card-heading-row"><h5>Godkända ansökningar</h5><span id="approvedApplicationCount">0</span></div>
+                <div id="approvedApplicationsContainer" class="applications-list"><p class="empty-state">Inga godkända ännu.</p></div>
+              </div>
+            </div>
+
+            <div class="admin-card">
+              <h4>Super-Admin</h4>
+              <form id="superAdminForm" onsubmit="return handleSuperAdminFormSubmit();">
+                <label>
+                  Välj personal
+                  <select id="superAdminSelect">
+                    <option value="Sam">Sam</option>
+                    <option value="Lisa">Lisa</option>
+                    <option value="Theo">Theo</option>
+                  </select>
+                </label>
+                <label>
+                  Ge behörighet
+                  <select id="adminPermission">
+                    <option value="Shift Admin">Shift Admin</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Super-Admin" class="super-admin-option" style="display: none;">Super-Admin</option>
+                  </select>
+                </label>
+                <button type="submit" class="secondary-btn full">Uppdatera behörighet</button>
+              </form>
+              <ul id="adminList" class="list-box"></ul>
+            </div>
+
+            <div id="masterLogCard" class="admin-card wide-card" hidden>
+              <h4>Master Log</h4>
+              <div id="managerStats"></div>
+              <ul id="masterLogList" class="list-box"></ul>
+            </div>
+
+            <div class="admin-card wide-card">
+              <h4>Menyskapare</h4>
+              <form id="menuForm" onsubmit="
+                event.preventDefault();
+                const name = document.getElementById('menuName')?.value?.trim();
+                const price = document.getElementById('menuPrice')?.value;
+                const category = document.getElementById('menuCategory')?.value;
+                const emoji = document.getElementById('menuEmoji')?.value?.trim();
+                const desc = document.getElementById('menuDesc')?.value?.trim();
+                const ingredients = document.getElementById('menuIngredients')?.value?.trim() || '';
+                const allergens = document.getElementById('menuAllergens')?.value?.trim() || '';
+                const calories = document.getElementById('menuCalories')?.value?.trim() || '';
+                const isBreakfast = document.getElementById('menuBreakfast')?.checked || false;
+                const favorite = document.getElementById('menuFavorite')?.checked || false;
+                const staffOnly = document.getElementById('menuStaffOnly')?.checked || false;
+                if (name && price && category && emoji && desc) {
+                  if (typeof menuItems !== 'undefined' && typeof renderMenu !== 'undefined') {
+                    const newId = (menuItems.length > 0 ? Math.max(...menuItems.map(m => m.id || 0)) : 0) + 1;
+                    menuItems.push({ id: newId, name: name, price: parseFloat(price), category: category, emoji: emoji, description: desc, ingredients: ingredients, allergens: allergens, calories: calories, isBreakfast: isBreakfast, favorite: favorite, seasonal: document.getElementById('menuSeasonal')?.checked || false, limitedUntil: document.getElementById('menuLimitedUntil')?.value || '', staffOnly: staffOnly, archived: false });
+                    localStorage.setItem('menuItems', JSON.stringify(menuItems));
+                    renderMenu();
+                    document.getElementById('menuForm').reset();
+                    alert('Maträtt tillagd!');
+                  }
+                } else {
+                  alert('Fyll i alla fält!');
+                }
+              ">
+                <div class="split-fields">
+                  <label>
+                    Maträtt
+                    <input type="text" id="menuName" placeholder="Tex. BBQ Burger" required />
+                  </label>
+                  <label>
+                    Pris
+                    <input type="number" min="1" id="menuPrice" placeholder="129" required />
+                  </label>
+                </div>
+                <div class="split-fields">
+                  <label>
+                    Kategori
+                    <select id="menuCategory" required>
+                      <option value="Burgers">Burgers</option>
+                      <option value="Drinks">Drinks</option>
+                      <option value="Fries">Fries</option>
+                      <option value="Sides">Sides</option>
+                      <option value="Desserts">Desserts</option>
+                      <option value="Extras">Extras</option>
+                    </select>
+                  </label>
+                  <label>
+                    Emoji
+                    <input type="text" id="menuEmoji" placeholder="🍔" value="🍔" maxlength="2" required />
+                  </label>
+                </div>
+                <label>
+                  Beskrivning
+                  <textarea id="menuDesc" rows="3" placeholder="Beskrivning..." required></textarea>
+                </label>
+                <label>Ingredienser (valfritt)<textarea id="menuIngredients" rows="2" placeholder="1x bröd, 2x kött, 2x ost"></textarea></label>
+                <label>Allergener (valfritt)<input id="menuAllergens" placeholder="Gluten, Laktos, Nötter" /></label>
+                <label>Kalorier (valfritt)<input id="menuCalories" placeholder="Ex. 350 kcal" /></label>
+                <label class="checkbox-label"><input id="menuFavorite" type="checkbox" /> Anställdas favorit</label>
+                <label class="checkbox-label"><input id="menuBreakfast" type="checkbox" /> 🌅 Frukostmeny</label>
+                <label class="checkbox-label"><input id="menuStaffOnly" type="checkbox" /> 👤 Endast personal (dölj från meny)</label>
+                <label>
+                  Limited Edition till (valfritt)
+                  <input type="datetime-local" id="menuLimitedUntil" />
+                </label>
+                <label class="checkbox-label"><input id="menuSeasonal" type="checkbox" /> Tidsbegränsad meny</label>
+                <label>
+                  Bild på maträtten
+                  <input type="file" id="menuImage" accept="image/png,image/jpeg,image/webp" />
+                  <small>Valfritt. Bilden visas på menyn.</small>
+                </label>
+                <button type="submit" class="primary-btn full">Lägg till i meny</button>
+              </form>
+              <ul id="menuEditorList" class="list-box"></ul>
+            </div>
+
+            <div class="admin-card wide-card">
+              <h4>Tillbehör & Extras (Add-ons)</h4>
+              <p style="font-size: 0.9rem; color: var(--muted); margin: 0 0 14px 0;">Hantera tillbehör som kunder och personal kan lägga till på sin beställning (t.ex. Extra dippsås, Plusmeny, Extra ostskiva).</p>
+              <form onsubmit="return addAddon(event);">
+                <div class="split-fields">
+                  <label>
+                    Tillbehörsnamn
+                    <input type="text" id="addonName" placeholder="Ex. Extra dippsås" required />
+                  </label>
+                  <label>
+                    Pris
+                    <input type="number" min="0" id="addonPrice" placeholder="10" required />
+                  </label>
+                </div>
+                <label>
+                  Emoji
+                  <input type="text" id="addonEmoji" placeholder="🟡" value="🟡" maxlength="2" required />
+                </label>
+                <label class="checkbox-label">
+                  <input id="addonPopular" type="checkbox" /> Populärt tillbehör
+                </label>
+                <button type="submit" class="secondary-btn full">Lägg till tillbehör</button>
+              </form>
+              <div style="margin-top: 14px;">
+                <p style="font-weight: 600; font-size: 0.9rem; color: var(--accent); margin-bottom: 8px;">Tillgängliga tillbehör:</p>
+                <ul id="addonList" class="list-box" style="margin: 0;"></ul>
+              </div>
+            </div>
+
+            <div class="admin-card wide-card">
+              <div class="card-heading-row"><div><span class="eyebrow">Planering</span><h4>Eventkalender</h4></div><span class="live-status"><span></span> Synkas live</span></div>
+              <form id="eventForm">
+                <div class="split-fields">
+                  <label>Event<input id="eventName" required placeholder="Bilträff på parkeringen" /></label>
+                  <label>Tid<input id="eventTime" type="datetime-local" required /></label>
+                </div>
+                <label>Beskrivning<textarea id="eventDescription" rows="3" required placeholder="Skriv vad som händer..."></textarea></label>
+                <label>Samarbete/sponsor (valfritt)<input id="eventSponsor" placeholder="Polisen / DOT" /></label>
+                <label>Vädertema<select id="eventWeather"><option value="">Ingen</option><option value="sun">Sol</option><option value="rain">Regn</option><option value="snow">Snö</option></select></label>
+                <button type="submit" class="primary-btn full">Lägg till event</button>
+              </form>
+              <ul id="eventEditorList" class="list-box"></ul>
+            </div>
+
+            <div class="admin-card wide-card">
+              <h4>Aktuellt – Dagens erbjudande</h4>
+              <form id="specialForm" onsubmit="
+                event.preventDefault();
+                const newText = document.getElementById('specialText')?.value?.trim();
+                const specialUntil = document.getElementById('specialUntil')?.value || '';
+                if (newText) {
+                  const dispEl = document.getElementById('currentSpecialDisplay');
+                  if (dispEl) dispEl.textContent = newText;
+                  localStorage.setItem('specialOffer', newText);
+                  localStorage.setItem('specialOfferUntil', specialUntil);
+                  alert('Aktuellt erbjudande uppdaterat!');
+                  document.getElementById('specialForm').reset();
+                } else {
+                  alert('Skriv något först!');
+                }
+              ">
+                <label>
+                  Vad är aktuellt idag?
+                  <textarea id="specialText" rows="3" placeholder="Skriv dagens erbjudande..." required></textarea>
+                </label>
+                <label>Erbjudandet gäller till (valfritt)<input id="specialUntil" type="datetime-local" /></label>
+                <button type="submit" class="primary-btn full">Uppdatera erbjudande</button>
+              </form>
+              <div style="margin-top: 18px; padding: 14px; background: rgba(255, 123, 44, 0.1); border-radius: 12px; border: 1px solid rgba(255, 123, 44, 0.2);">
+                <p style="margin: 0 0 8px 0; font-weight: 600; color: var(--accent);">Aktuellt nu:</p>
+                <p id="currentSpecialDisplay" style="margin: 0; color: var(--muted); font-style: italic;"></p>
+              </div>
+              <form id="happyMealForm" onsubmit="return saveHappyMealToy(event);" style="margin-top: 18px;">
+                <label>Dagens Happy Meal-leksak<input id="happyMealToyInput" maxlength="80" placeholder="Mini-sportbil" /></label>
+                <button type="submit" class="secondary-btn full">Uppdatera leksak</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <a class="discord-link" href="https://discord.gg/stockholmswedenroleplay" target="_blank" rel="noreferrer">Join Discord</a>
+        <p>Betalas via Polreg.se</p>
+      </div>
+    </footer>
+    <script src="script.js"></script>
+    <script>
+      function handleEmployeeFormSubmit(event) {
+        if (event) event.preventDefault();
+        
+        const nameEl = document.getElementById('employeeName');
+        const roleEl = document.getElementById('employeeRole');
+        const passwordEl = document.getElementById('employeePassword');
+        
+        if (!nameEl || !roleEl || !passwordEl) {
+          console.error('Form elements not found');
+          return false;
+        }
+        
+        const name = nameEl.value.trim();
+        const role = roleEl.value;
+        const password = passwordEl.value.trim();
+        
+        if (!name || !password) {
+          alert('Fyll i namn och lösenord!');
+          return false;
+        }
+        
+        const username = name.toLowerCase().replace(/[^a-z0-9åäö]/gi, '');
+
+        if (!username || employees.some(employee => employee.username.toLowerCase() === username.toLowerCase())) {
+          alert('Det användarnamnet finns redan!');
+          return false;
+        }
+        
+        const newEmployee = {
+          username: username,
+          password: password,
+          name: name,
+          role: role,
+          warnings: [],
+          inactivePasses: 0,
+          hiredAt: new Date().toISOString(),
+          probationUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+        };
+        
+        if (typeof employees === 'undefined') {
+          window.employees = [];
+        }
+        employees.push(newEmployee);
+        if (typeof saveEmployees === 'function') {
+          saveEmployees(employees);
+        }
+        
+        renderEmployeeList();
+        renderAdminOverview();
+        renderWorkforce();
+        
+        document.getElementById('employeeForm').reset();
+        alert('Konto skapat! Användarnamn: ' + username);
+        return false;
+      }
+      
+      function handleSuperAdminFormSubmit(event) {
+        if (event) event.preventDefault();
+        
+        // Get the current admin role
+        const adminRole = window.currentAdminRole || 'Admin';
+        
+        // Only Super-Admin or Owner can assign Super-Admin role
+        const permissionEl = document.getElementById('adminPermission');
+        if (permissionEl && permissionEl.value === 'Super-Admin') {
+          if (adminRole !== 'Super-Admin' && adminRole !== 'Owner') {
+            alert('Endast Super-Admin kan ge Super-Admin behörighet!');
+            return false;
+          }
+        }
+        
+        const personEl = document.getElementById('superAdminSelect');
+        
+        if (!personEl || !permissionEl) return false;
+        
+        const person = personEl.value;
+        const permission = permissionEl.value;
+        
+        const adminList = document.getElementById('adminList');
+        if (adminList) {
+          const item = document.createElement('li');
+          item.textContent = person + ' • ' + permission;
+          adminList.appendChild(item);
+        }
+        
+        document.getElementById('superAdminForm').reset();
+        alert('Behörighet uppdaterad för ' + person + ' till ' + permission);
+        return false;
+      }
+    </script>
+  </body>
+</html>

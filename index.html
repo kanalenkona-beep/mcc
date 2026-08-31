@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>McDonalds Hamburgare</title>
+    <meta
+      name="description"
+      content="McDonalds Hamburgare – beställ hamburgare, se meny och hantera personal."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-bg" aria-hidden="true"></div>
+    <div class="backdrop"></div>
+
+    <header class="topbar">
+      <div class="container nav-wrap">
+        <a class="brand" href="https://discord.gg/V5Ub2KcZC" target="_blank" rel="noreferrer" aria-label="Gå till McDonalds DC">
+          <span class="brand-mark">M</span>
+          <div>
+            <strong>McDonalds</strong>
+            <small>DC</small>
+          </div>
+        </a>
+
+        <nav class="main-nav">
+          <a href="menu.html">Meny</a>
+          <a href="menu.html#order">Beställ</a>
+          <a href="staff.html">Personal</a>
+          <a href="apply.html">Ansök</a>
+        </nav>
+
+        <a class="nav-button" href="staff.html">Personal login</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero container">
+        <div class="hero-copy">
+          <span class="eyebrow">Stockholms favorit • Hämtas varmt</span>
+          <h1>McDonalds Hamburgare</h1>
+          <p>
+            Nya grillade burgare, krispiga pommes och smaker som sätter smaklökarna
+            i gång. Beställ direkt online eller ta en titt på vår meny.
+          </p>
+
+          <div class="cta-row">
+            <a class="primary-btn" href="menu.html">Se menyn</a>
+            <a class="secondary-btn" href="menu.html#order">Beställ nu</a>
+          </div>
+
+          <div class="feature-list">
+            <div>
+              <strong>Fresh</strong>
+              <span>Grillad varje dag</span>
+            </div>
+            <div>
+              <strong>Fast</strong>
+              <span>Redo för upphämtning</span>
+            </div>
+            <div>
+              <strong>Populär</strong>
+              <span>Stockholms bästa hamburgare!</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-label="Restaurant status panel">
+          <div class="burger-card main-card">
+            <div class="badge-pill">McDonalds online</div>
+            <div class="status-card">
+              <h3>McDonalds Burger</h3>
+              <ul>
+                <li>Beställ direkt i RP</li>
+                <li>Färska burgare &amp; pommes</li>
+                <li>Hämtas i Stockholm City</li>
+              </ul>
+              <div class="status-meta">
+                <span>Öppet nu</span>
+                <button>Beställ</button>
+              </div>
+            </div>
+            <div class="live-strip">
+              <div><span class="live-dot"></span><strong id="restaurantStatus">Kontrollerar bemanning...</strong><small id="restaurantStatusDetail">Stockholm City</small></div>
+              <div><strong id="queueStatus">Ingen kö</strong><small>Aktuell kö</small></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="community-section container">
+        <div class="community-grid">
+          <div class="info-card">
+            <span class="eyebrow">Stockholm City</span>
+            <h3>Så funkar besöket</h3>
+            <ul>
+              <li>Beställ från kiosken och välj Takeaway eller Äta här.</li>
+              <li>Hämta vid Kassa eller Drive-thru när din kod ropas upp.</li>
+              <li>Respektera kön och håll RP-miljön trevlig.</li>
+              <li>Inga synliga vapen i restaurangen.</li>
+            </ul>
+          </div>
+          <div class="info-card accent">
+            <span class="eyebrow">Kommande event</span>
+            <h3 id="publicEventName">Fredag på parkeringen</h3>
+            <p id="publicEventDescription">Bilträff på McDonalds Stockholm City fredag kl. 20:00. Gratis kaffe för alla RP-gäster.</p>
+            <small id="publicEventTime">Fredag kl. 20:00</small>
+            <small id="publicEventCountdown"></small>
+            <a class="secondary-btn event-link" href="https://discord.gg/stockholmswedenroleplay" target="_blank" rel="noreferrer">Se event i Discord</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="community-section container">
+        <div class="info-card accent">
+          <span class="eyebrow">Månadens arbetare</span>
+          <h3 id="hallOfFameName">Hall of Fame</h3>
+          <p id="hallOfFameDetail">Statistik visas när personalen har slutfört ordrar.</p>
+        </div>
+      </section>
+
+      <section id="menu" class="menu-section container">
+        <div class="section-heading">
+          <span class="eyebrow">Meny</span>
+          <h2>Vår smakfulla meny</h2>
+        </div>
+
+        <div id="menuGrid" class="menu-grid"></div>
+      </section>
+
+      <section id="order" class="order-section container">
+        <div class="section-heading narrow">
+          <span class="eyebrow">Beställning</span>
+          <h2>Din beställning</h2>
+        </div>
+
+        <div class="order-wrap">
+          <div class="cart-panel">
+            <div id="cartItems" class="cart-items">
+              <p class="empty-cart">Din kundvagn är tom. Lägg till något från menyn.</p>
+            </div>
+
+            <div class="totals">
+              <div>
+                <span>Summa</span>
+                <strong id="subtotal">0 kr</strong>
+              </div>
+              <hr />
+              <div class="grand-total">
+                <span>Total</span>
+                <strong id="totalPrice">0 kr</strong>
+              </div>
+            </div>
+
+            <button class="checkout-btn">Betala till ErkanBra</button>
+            <p class="payment-note">Betalas via Polreg.se</p>
+          </div>
+
+          <div class="info-panel">
+            <div class="info-card">
+              <h3>RP-beställning</h3>
+              <ul>
+                <li>Ingen frakt – beställning sker i RP</li>
+                <li>Välj mat direkt från menyn</li>
+                <li>Ta bort eller ändra val innan du betalar</li>
+              </ul>
+            </div>
+            <div class="info-card accent">
+              <h3>Aktuellt</h3>
+              <p>McDonalds Fredag Special – ingen: Websida is down.</p>
+            </div>
+            <div class="info-card">
+              <h3>Dagens Happy Meal-leksak</h3>
+              <p id="happyMealToyDisplay">Ingen leksak angiven just nu.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="staff" class="staff-section container">
+        <div class="section-heading">
+          <span class="eyebrow">Personal</span>
+          <h2>Shift & admin</h2>
+        </div>
+
+        <div id="loginCard" class="staff-panel">
+          <form id="loginForm" class="login-card">
+            <h3>Logga in</h3>
+            <label>
+              Användarnamn
+              <input type="text" id="username" placeholder="ex. shiftadmin" required />
+            </label>
+            <label>
+              Lösenord
+              <input type="password" id="password" placeholder="••••••••" required />
+            </label>
+            <p id="loginStatus" class="login-status hidden" role="alert"></p>
+            <button type="submit" class="primary-btn full">Logga in</button>
+          </form>
+
+          <div id="staffPortal" class="portal hidden">
+            <div class="portal-header">
+              <div>
+                <span class="eyebrow">Portal</span>
+                <h3>Personalhantering</h3>
+              </div>
+              <button id="logoutBtn" class="ghost-btn">Logga ut</button>
+            </div>
+
+            <div class="portal-grid">
+              <div class="admin-card">
+                <h4>Shift Admin</h4>
+                <form id="employeeForm">
+                  <label>
+                    Namn
+                    <input type="text" id="employeeName" placeholder="Namn" required />
+                  </label>
+                  <label>
+                    Roll
+                    <select id="employeeRole">
+                      <option value="Kassör">Kassör</option>
+                      <option value="Kock">Kock</option>
+                      <option value="Leverans">Leverans</option>
+                      <option value="Admin">Admin</option>
+                    </select>
+                  </label>
+                  <div class="permission-box">
+                    <label><input type="checkbox" checked /> Beställningar</label>
+                    <label><input type="checkbox" checked /> Kundservice</label>
+                    <label><input type="checkbox" /> Menyredigering</label>
+                    <label><input type="checkbox" /> Lönehantering</label>
+                  </div>
+                  <button type="submit" class="secondary-btn full">Lägg till personal</button>
+                </form>
+                <ul id="employeeList" class="list-box"></ul>
+              </div>
+
+              <div class="admin-card">
+                <h4>Super-Admin</h4>
+                <form id="superAdminForm">
+                  <label>
+                    Välj personal
+                    <select id="superAdminSelect">
+                      <option value="Sam">Sam</option>
+                      <option value="Lisa">Lisa</option>
+                      <option value="Theo">Theo</option>
+                    </select>
+                  </label>
+                  <label>
+                    Ge behörighet
+                    <select id="adminPermission">
+                      <option value="Admin">Admin</option>
+                      <option value="Super-Admin">Super-Admin</option>
+                    </select>
+                  </label>
+                  <button type="submit" class="secondary-btn full">Uppdatera behörighet</button>
+                </form>
+                <ul id="adminList" class="list-box"></ul>
+              </div>
+
+              <div class="admin-card wide-card">
+                <h4>Menyskapare</h4>
+                <form id="menuForm">
+                  <div class="split-fields">
+                    <label>
+                      Maträtt
+                      <input type="text" id="menuName" placeholder="Tex. BBQ Burger" required />
+                    </label>
+                    <label>
+                      Pris
+                      <input type="number" min="1" id="menuPrice" placeholder="129" required />
+                    </label>
+                  </div>
+                  <label>
+                    Beskrivning
+                    <textarea id="menuDesc" rows="3" placeholder="Beskrivning..." required></textarea>
+                  </label>
+                  <button type="submit" class="primary-btn full">Lägg till i meny</button>
+                </form>
+                <ul id="menuEditorList" class="list-box"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <a class="discord-link" href="https://discord.gg/V5Ub2KcZC" target="_blank" rel="noreferrer">
+          McDonalds DC
+        </a>
+        <a class="discord-link ssrp-box" href="https://discord.gg/stockholmswedenroleplay" target="_blank" rel="noreferrer" aria-label="Gå till SSRP DC">
+          SSRP DC
+        </a>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

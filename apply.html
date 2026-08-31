@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>McDonalds Stockholm City | Ansök</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+    <header class="topbar">
+      <div class="container nav-wrap">
+        <a class="brand" href="index.html" aria-label="Startsida">
+          <span class="brand-mark">M</span>
+          <div><strong>McDonalds</strong><small>Hamburgare</small></div>
+        </a>
+        <nav class="main-nav">
+          <a href="menu.html">Meny</a>
+          <a href="menu.html#order">Beställ</a>
+          <a href="staff.html">Personal</a>
+          <a href="apply.html">Ansök</a>
+        </nav>
+        <a class="nav-button" href="menu.html">Se meny</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="portal-shell application-layout">
+        <div class="application-intro">
+          <span class="eyebrow">McDonalds Stockholm City</span>
+          <h1>Jobba med McDonalds i Stockholm City.</h1>
+          <p>Skicka in din ansökan så återkommer en ansvarig i Discord.</p>
+          <div class="application-signal"><span></span> Ansökningar öppna just nu</div>
+          <div class="feature-list">
+            <div><strong>Teamkänsla</strong><span>Jobba tillsammans i RP</span></div>
+            <div><strong>Flexibla pass</strong><span>Välj tider som passar</span></div>
+            <div><strong>Utveckling</strong><span>Väx från crew till ansvarig</span></div>
+          </div>
+        </div>
+        <form id="applicationForm" class="login-card application-form">
+          <div class="application-form-header">
+            <div>
+              <span class="form-kicker">Steg 01 / 01</span>
+              <h2>Ansök här</h2>
+            </div>
+            <span class="form-mark">M</span>
+          </div>
+          <p class="application-form-intro">Berätta vem du är och vad du vill bidra med i teamet.</p>
+          <label>1. Discord-namn<input id="appDiscord" required pattern="^.{2,32}#[0-9]{4}$|^@?[A-Za-z0-9_.-]{2,32}$" title="Skriv ett giltigt Discord-namn, till exempel namn eller namn#1234." placeholder="Ditt Discord-namn" /></label>
+          <label>2. Roblox-namn<input id="appName" required placeholder="Ditt Roblox-namn" /></label>
+          <label>3. RP-ålder<input id="appAge" type="number" min="13" max="100" required placeholder="Din karaktärs ålder" /></label>
+          <label>3. Discord ID om känt<input id="appDiscordId" placeholder="Ditt Discord-ID (valfritt)" /></label>
+          <label>Önskad intervjutid<select id="appInterviewTime" required><option value="">Välj en tid</option><option>Vardagar 18:00–19:00</option><option>Vardagar 19:00–20:00</option><option>Helger 15:00–17:00</option><option>Jag är flexibel</option></select></label>
+          <label>Beskriv din RP-karaktär med tre ord<input id="appCharacter" required maxlength="80" placeholder="Ex. lugn, hjälpsam, snabb" /></label>
+          <label>Bild på din RP-karaktär (valfritt)<input id="appCharacterImage" type="url" placeholder="https://..." /></label>
+          <label class="checkbox-label"><input id="appPreviousEmployee" type="checkbox" /> Jag har varit anställd här tidigare.</label>
+          <label>Har du tidigare McDonalds-RP-erfarenhet? Beskriv den.<textarea id="appExperience" rows="4" required></textarea></label>
+          <label>4. Varför vill du ansöka till McDonalds?<textarea id="appWhy" rows="4" required></textarea></label>
+          <label>5. Har du några svårigheter som kan göra ditt jobb svårare?<textarea id="appDifficulties" rows="3" required></textarea></label>
+          <label>Vilken roll söker du?<select id="appRole"><option value="Kock">🍔 Kock - grill och pommes</option><option value="Kassör">🧋 Kassör - drive-thru och kassa</option><option value="Lageransvarig">📦 Lageransvarig - ingredienser</option></select></label>
+          <fieldset><legend>När kan du oftast rollspela?</legend><label class="checkbox-label"><input name="appAvailability" value="Vardagskvällar" type="checkbox" /> Vardagskvällar</label><label class="checkbox-label"><input name="appAvailability" value="Helger" type="checkbox" /> Helger</label><label class="checkbox-label"><input name="appAvailability" value="Nätter" type="checkbox" /> Nätter</label></fieldset>
+          <label class="checkbox-label"><input id="appPolicy" type="checkbox" required /> Jag godkänner restaurangens RP-policy och serverregler.</label>
+          <button class="primary-btn full application-submit" type="submit"><span>Skicka ansökan</span><strong>→</strong></button>
+          <p id="applicationStatus" class="login-status hidden" role="status"></p>
+        </form>
+      </section>
+    </main>
+    <footer class="footer"><div class="container footer-inner"><a class="discord-link" href="https://discord.gg/stockholmswedenroleplay" target="_blank" rel="noreferrer">Join Discord</a><p>Betalas via Polreg.se</p></div></footer>
+    <script>
+      document.getElementById('applicationForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = document.getElementById('appName').value.trim();
+        const previousApplications = JSON.parse(localStorage.getItem('applications') || '[]');
+        const denied = previousApplications.find((entry) => entry.name.toLowerCase() === name.toLowerCase() && entry.status === 'Avslagen' && entry.deniedAt);
+        if (denied && Date.now() - new Date(denied.deniedAt).getTime() < 7 * 24 * 60 * 60 * 1000) {
+          const daysLeft = Math.ceil((7 * 24 * 60 * 60 * 1000 - (Date.now() - new Date(denied.deniedAt).getTime())) / (24 * 60 * 60 * 1000));
+          const status = document.getElementById('applicationStatus');
+          status.textContent = `Du kan ansöka igen om ${daysLeft} dagar.`;
+          status.classList.remove('hidden');
+          return;
+        }
+        const application = {
+          name,
+          rpAge: document.getElementById('appAge').value,
+          discord: document.getElementById('appDiscord').value.trim(),
+          discordId: document.getElementById('appDiscordId').value.trim(),
+          interviewTime: document.getElementById('appInterviewTime').value,
+          character: document.getElementById('appCharacter').value.trim(),
+          characterImage: document.getElementById('appCharacterImage').value.trim(),
+          previousEmployee: document.getElementById('appPreviousEmployee').checked,
+          availability: Array.from(document.querySelectorAll('input[name="appAvailability"]:checked')).map((input) => input.value),
+          role: document.getElementById('appRole').value,
+          experience: document.getElementById('appExperience').value.trim(),
+          why: document.getElementById('appWhy').value.trim(),
+          difficulties: document.getElementById('appDifficulties').value.trim(),
+          message: document.getElementById('appWhy').value.trim(),
+          createdAt: new Date().toISOString(),
+          status: 'Ny',
+          response: ''
+        };
+        const applications = JSON.parse(localStorage.getItem('applications') || '[]');
+        applications.push(application);
+        localStorage.setItem('applications', JSON.stringify(applications));
+        const status = document.getElementById('applicationStatus');
+        status.textContent = 'Ansökan skickad! En ansvarig kontaktar dig i Discord.';
+        status.classList.remove('hidden');
+        event.target.reset();
+      });
+
+      document.getElementById('applicationForm').insertAdjacentHTML('afterend', '<form id="applicationLookup" class="login-card" style="margin-top: 18px;"><label>Kontrollera ansökningsstatus<input id="lookupName" required placeholder="Roblox-namn" /></label><button class="secondary-btn full" type="submit">Visa status</button><p id="lookupStatus" class="login-status hidden" role="status"></p></form>');
+      document.getElementById('applicationLookup').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = document.getElementById('lookupName').value.trim().toLowerCase();
+        const application = JSON.parse(localStorage.getItem('applications') || '[]').find((entry) => entry.name.toLowerCase() === name);
+        const status = document.getElementById('lookupStatus');
+        status.textContent = application ? `Status: ${application.status}` : 'Ingen ansökan hittades för det namnet.';
+        status.classList.remove('hidden');
+      });
+    </script>
+  </body>
+</html>
